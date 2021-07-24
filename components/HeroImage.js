@@ -1,10 +1,11 @@
 import styled from "styled-components"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { imageHigh, imageLow } from "../key/apikey"
 import { useRouter } from "next/router"
 import Link from "next/link"
+import { saveMovie, saveTv, removeMovie, removeTv } from "../key/Save"
 
-const HeroImage = ({ trends }) => {
+const HeroImage = ({ trends, type }) => {
 	const truncate = (text) => {
 		if (text.length > 200) {
 			return text.substr(0, 200) + "..."
@@ -12,9 +13,15 @@ const HeroImage = ({ trends }) => {
 		return text
 	}
 
+	const [hero, setHeroImage] = useState([])
+	const [moviesSaved, setMoviesSaved] = useState([])
+	const [tvSaved, setTvSaved] = useState([])
+
 	const router = useRouter()
 
 	const allHero = [8, 9, 10, 11, 12, 13, 14, 15]
+
+	console.log(moviesSaved)
 
 	useEffect(() => {
 		const shift = () => {
@@ -38,15 +45,67 @@ const HeroImage = ({ trends }) => {
 		}
 		let run = window.setInterval(shift, 6000)
 
+		const savedMovies = () =>
+			localStorage.getItem("savedMovies")
+				? JSON.parse(localStorage.getItem("savedMovies"))
+				: []
+
+		const savedTvs = () =>
+			localStorage.getItem("savedTvs") ? JSON.parse(localStorage.getItem("savedTvs")) : []
+
+		setMoviesSaved(savedMovies())
+
+		setTvSaved(savedTvs())
+
 		return () => window.clearInterval(run)
 	}, [])
+
+	const save = (index) => {
+		console.log(trends[index])
+		let {
+			poster_path,
+			name,
+			title,
+			id,
+			release_date,
+			first_air_date,
+			vote_average,
+			media_type,
+		} = trends[index]
+		vote_average = vote_average.toFixed(1)
+
+		if ((media_type ? media_type : type) === "movie") {
+			release_date = release_date.split("-")[0]
+
+			let movie = { poster_path, title, id, release_date, vote_average }
+			saveMovie(moviesSaved, movie)
+			setMoviesSaved((prev) => [...prev, movie])
+		} else {
+			first_air_date = first_air_date.split("-")[0]
+
+			let tv = { poster_path, name, id, first_air_date, vote_average }
+			saveTv(tvSaved, tv)
+			setTvSaved((prev) => [...prev, tv])
+		}
+	}
+
+	const remove = (index) => {
+		console.log(trends[index])
+		let { id, media_type } = trends[index]
+		if ((media_type || type) === "movie") {
+			removeMovie(moviesSaved, id)
+			setMoviesSaved((prev) => prev.filter((item) => item.id !== id))
+		} else {
+			removeTv(tvSaved, id)
+			setTvSaved((prev) => prev.filter((item) => item.id !== id))
+		}
+	}
 
 	return (
 		<HeroComponent>
 			<div className="image-container">
 				{allHero.map((i, n) => (
 					<ImageComponent
-						onclick={() => router.push(`/${trends[i].media_type}/${trends[i].id}`)}
 						key={i}
 						style={{
 							backgroundImage: `url('${imageHigh}${
@@ -64,11 +123,30 @@ const HeroImage = ({ trends }) => {
 							<h1>{`${trends[i].name ? trends[i].name : trends[i].title}`}</h1>
 							<ButtonsComponent>
 								<button type="button">
-									<Link href={`/${trends[i].media_type}/${trends[i].id}`}>
-										view movie
+									<Link
+										href={`/${
+											(trends[i].media_type || type) === "tv"
+												? "tv"
+												: "movies"
+										}/details/${trends[i].id}`}
+									>
+										{(trends[i].media_type || type) === "tv"
+											? "view tv show"
+											: "view movie"}
 									</Link>
 								</button>
-								<button type="button">add to list</button>
+								{((trends[i].media_type ? trends[i].media_type : type) === "movie"
+									? moviesSaved
+									: tvSaved
+								).find((item) => +item.id === +trends[i].id) ? (
+									<button onClick={() => remove(i)} type="button">
+										added to list
+									</button>
+								) : (
+									<button onClick={() => save(i)} type="button">
+										add to list
+									</button>
+								)}
 							</ButtonsComponent>
 							<p>{truncate(`${trends[i].overview}`)}</p>
 						</DetailsComponent>

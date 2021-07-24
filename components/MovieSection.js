@@ -21,7 +21,7 @@ export default MovieSection
 
 export const MovieContainer = styled.div`
 	width: 96%;
-	margin: 4rem auto;
+	margin: 3rem auto;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

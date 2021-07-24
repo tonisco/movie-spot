@@ -4,12 +4,12 @@ import Link from "next/link"
 import { imageLow, movieGenres, tvGenres } from "../key/apikey"
 
 const MovieCard = ({ data, all, type }) => {
-	let number = all ? 1000 : 6
+	let number = all ? 1000 : 7
 
-	const genred = (ids) => {
+	const genred = (ids, media) => {
 		let values = []
 		ids.map((id) => {
-			let found = (type === "movies" ? movieGenres : tvGenres).find(
+			let found = (type === "movies" || media === "movie" ? movieGenres : tvGenres).find(
 				(genre) => genre.id === id
 			)
 			if (found) values.push(found.name)
@@ -26,7 +26,17 @@ const MovieCard = ({ data, all, type }) => {
 				.map((movie, i) => {
 					if (i < number) {
 						return (
-							<Link key={movie.id} href={`/${type}/details/${movie.id}`} passHref>
+							<Link
+								key={movie.id}
+								href={`/${
+									type
+										? type
+										: movie.media_type !== "tv"
+										? `${movie.media_type}s`
+										: movie.media_type
+								}/details/${movie.id}`}
+								passHref
+							>
 								<CardContainer className="">
 									<div>
 										<Image
@@ -42,12 +52,8 @@ const MovieCard = ({ data, all, type }) => {
 										/>
 									</div>
 									<h2>{`${movie.name ? movie.name : movie.title}`}</h2>
-									<p>{genred(movie.genre_ids)}</p>
-									<h4>{`${
-										String(movie.vote_average).split(".")[1]
-											? movie.vote_average
-											: `${movie.vote_average}.0`
-									}`}</h4>
+									<p>{genred(movie.genre_ids, movie.media_type)}</p>
+									<h4>{`${movie.vote_average.toFixed(1)}`}</h4>
 								</CardContainer>
 							</Link>
 						)
@@ -59,18 +65,19 @@ const MovieCard = ({ data, all, type }) => {
 
 export default MovieCard
 
-const CardComponent = styled.div`
+export const CardComponent = styled.div`
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 	gap: 1.5rem;
 	width: 100%;
 	margin: 3rem auto;
 	transition: all 0.3s ease;
 `
 
-const CardContainer = styled.div`
+export const CardContainer = styled.div`
 	position: relative;
 	cursor: pointer;
+	max-width: 20rem;
 
 	& > div > div > img {
 		border-radius: 5px;

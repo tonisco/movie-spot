@@ -6,7 +6,7 @@ import { discoverMovie, moviePopular } from "../../key/links"
 export default function Home({ trends, list }) {
 	return (
 		<Layout title="Movie Spot | Movies">
-			<HeroImage trends={trends.results} />
+			<HeroImage trends={trends.results} type="movie" />
 			{list.map((movie) => {
 				return (
 					<MovieSection

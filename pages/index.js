@@ -1,15 +1,8 @@
 import Layout from "../components/Layout"
 import HeroImage from "../components/HeroImage"
 import MovieSection from "../components/MovieSection"
-import {
-	trending,
-	tvPopular,
-	moviePopular,
-	movieList,
-	discoverMovie,
-	tvList,
-	discoverTv,
-} from "../key/links"
+import { trending, tvPopular, moviePopular, discoverMovie, discoverTv } from "../key/links"
+import { movieGenres, tvGenres } from "../key/apikey"
 
 export default function Home({
 	trends,
@@ -61,17 +54,14 @@ export async function getServerSideProps() {
 	const getMoviePopular = await fetch(moviePopular)
 	const moviePopularData = await getMoviePopular.json()
 
-	const getMovieList = await fetch(movieList)
-	const { genres: movieGenres } = await getMovieList.json()
 	const genreMovieIndex = Math.ceil(Math.random() * movieGenres.length)
 
 	const getMovieByGenre = await fetch(`${discoverMovie}${movieGenres[genreMovieIndex].id}`)
 	const movieByGenreData = await getMovieByGenre.json()
 
-	const getTvList = await fetch(tvList)
-	const { genres: tvGenres } = await getTvList.json()
 	let newTvGenres = tvGenres.filter(
-		(list) => list.name !== ("reality" || "shows" || "news" || "documentary")
+		(list) =>
+			list.name !== ("Reality" || "Shows" || "News" || "Documentary" || "Talk" || "Soap")
 	)
 	const genreTvIndex = Math.ceil(Math.random() * newTvGenres.length)
 

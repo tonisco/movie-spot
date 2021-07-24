@@ -6,7 +6,7 @@ import MovieSection from "../../components/MovieSection"
 export default function Home({ trends, list }) {
 	return (
 		<Layout title="Movie Spot | Tv Shows">
-			<HeroImage trends={trends.results} />
+			<HeroImage trends={trends.results} type="tv" />
 			{list.map((tv) => {
 				return (
 					<MovieSection

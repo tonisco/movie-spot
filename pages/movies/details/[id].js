@@ -1,12 +1,27 @@
 import Layout from "../../../components/Layout"
 import styled from "styled-components"
 import Image from "next/image"
-import { movieGetDetails, getMovieImage } from "../../../key/links"
+import { movieGetDetails, movieGetSimilar } from "../../../key/links"
 import { imageHigh, imageLow } from "../../../key/apikey"
-import { useRef } from "react"
+import { useRef, useEffect, useState } from "react"
+import { MovieContainer } from "../../../components/MovieSection"
+import MovieCard from "../../../components/MovieCard"
+import { removeMovie, saveMovie } from "../../../key/Save"
 
-const MovieDetails = ({ movieData }) => {
+const MovieDetails = ({ movieData, similarMovieData }) => {
 	const scrollRef = useRef("")
+
+	const [moviesSaved, setMoviesSaved] = useState([])
+
+	useEffect(() => {
+		const savedMovies = () =>
+			localStorage.getItem("savedMovies")
+				? JSON.parse(localStorage.getItem("savedMovies"))
+				: []
+
+		setMoviesSaved(savedMovies())
+	}, [])
+
 	const genre = (data) => {
 		let list = []
 		data.map((items) => {
@@ -57,14 +72,31 @@ const MovieDetails = ({ movieData }) => {
 
 	let formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
 
+	const save = () => {
+		let { poster_path, title, id, release_date, vote_average } = movieData
+		vote_average = vote_average.toFixed(1)
+		release_date = release_date.split("-")[0]
+
+		let movie = { poster_path, title, id, release_date, vote_average }
+		saveMovie(moviesSaved, movie)
+		setMoviesSaved((prev) => [...prev, movie])
+	}
+
+	const remove = () => {
+		removeMovie(moviesSaved, movieData.id)
+		setMoviesSaved((prev) => prev.filter((item) => item.id !== movieData.id))
+	}
+
 	return (
 		<Layout title={`Movie | ${movieData.title ? movieData.title : movieData.original_title}`}>
 			<ImageComponent
 				style={{
 					backgroundImage: `url('${imageHigh}${
-						movieData.images.backdrops[
-							Math.ceil(Math.random() * movieData.images.backdrops.length)
-						].file_path
+						movieData.images.backdrops.length > 1
+							? movieData.images.backdrops[
+									Math.floor(Math.random() * movieData.images.backdrops.length)
+							  ].file_path
+							: movieData.backdrop_path
 					}') `,
 					backgroundSize: "cover",
 					backgroundPosition: "center center",
@@ -74,9 +106,11 @@ const MovieDetails = ({ movieData }) => {
 				<Details>
 					<Image
 						src={`${imageHigh}${
-							movieData.images.posters[
-								Math.ceil(Math.random() * movieData.images.posters.length)
-							].file_path
+							movieData.images.posters.length > 1
+								? movieData.images.posters[
+										Math.floor(Math.random() * movieData.images.posters.length)
+								  ].file_path
+								: movieData.poster_path
 						}`}
 						height="375"
 						width="250"
@@ -84,16 +118,16 @@ const MovieDetails = ({ movieData }) => {
 					/>
 					<div className="details">
 						<h1>{movieData.title ? movieData.title : movieData.original_title}</h1>
-						<p>
-							{movieData.status === "Released"
-								? movieData.release_date.split("-")[0]
-								: movieData.release_date}
-						</p>
+						<p>{movieData.release_date.split("-")[0]}</p>
 						<h4>{`${genre(movieData.genres)}`}</h4>
-						<h2>{`${movieData.vote_average}`}</h2>
+						<h2>{`${movieData.vote_average.toFixed(1)}`}</h2>
 						<p>{time(movieData.runtime)}</p>
 						<h3>{movieData.overview}</h3>
-						<button>add to list</button>
+						{moviesSaved.find((item) => item.id === movieData.id) ? (
+							<button onClick={remove}>added to list</button>
+						) : (
+							<button onClick={save}>add to list</button>
+						)}
 					</div>
 				</Details>
 			</ImageComponent>
@@ -116,7 +150,7 @@ const MovieDetails = ({ movieData }) => {
 				</p>
 				<p>
 					vote count :
-					<span>{`${new Intl.NumberFormat().format(movieData.vote_count)} votes`}</span>
+					<span>{` ${new Intl.NumberFormat().format(movieData.vote_count)} votes`}</span>
 				</p>
 				<p>
 					budget : <span>{`${formatter.format(movieData.budget)}`}</span>
@@ -140,7 +174,7 @@ const MovieDetails = ({ movieData }) => {
 								<Image
 									height="225"
 									width="150"
-									alt="Movie Name"
+									alt="Cast"
 									src={`${imageLow}${person.profile_path}`}
 								/>
 								<h3>{`${person.name}`}</h3>
@@ -150,7 +184,27 @@ const MovieDetails = ({ movieData }) => {
 					})}
 				</PhotoComponent>
 			</Cast>
-			<SimilarComponent></SimilarComponent>
+			<TrailerComponent>
+				<h1>trailer</h1>
+				<div>
+					<iframe
+						width="420"
+						height="315"
+						src={`https://www.youtube.com/embed/${
+							movieData.videos.results[movieData.videos.results.length - 1].key
+						}`}
+						allowFullScreen
+						frameBorder="0"
+					></iframe>
+				</div>
+				<p>{movieData.videos.results[movieData.videos.results.length - 1].name}</p>
+			</TrailerComponent>
+			<MovieContainer details>
+				<h1>{`recommended movies`}</h1>
+				<>
+					<MovieCard data={similarMovieData.results} type="movies" />
+				</>
+			</MovieContainer>
 		</Layout>
 	)
 }
@@ -163,14 +217,18 @@ export async function getServerSideProps({ params }) {
 	let movie = await fetch(`${movieGetDetails(id)}`)
 	let movieData = await movie.json()
 
+	let similarMovie = await fetch(`${movieGetSimilar(id)}`)
+	let similarMovieData = await similarMovie.json()
+
 	return {
 		props: {
 			movieData,
+			similarMovieData,
 		},
 	}
 }
 
-const ImageComponent = styled.div`
+export const ImageComponent = styled.div`
 	width: 100%;
 	height: 80vh;
 	position: relative;
@@ -178,7 +236,7 @@ const ImageComponent = styled.div`
 	overflow: hidden;
 `
 
-const Blur = styled.div`
+export const Blur = styled.div`
 	background-color: rgba(255, 255, 255, 0.2);
 	position: absolute;
 	top: 0;
@@ -188,13 +246,20 @@ const Blur = styled.div`
 	width: 100%;
 	height: 100%;
 `
-const Details = styled.div`
+export const Details = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	width: 100%;
 	height: 100%;
 	margin: 0 1rem;
+	@media (max-width: 28.175em) {
+		flex-direction: column;
+	}
+
+	& > div {
+		min-width: 22rem;
+	}
 
 	& > div > img {
 		border-radius: 10px;
@@ -208,33 +273,51 @@ const Details = styled.div`
 		z-index: 2;
 		color: #232323;
 		text-transform: capitalize;
+		@media (max-width: 45.625em) {
+			margin-left: 1.5rem;
+		}
 
 		& > h1 {
 			font-size: 3.5rem;
 			margin: 0.5rem 0;
+			@media (max-width: 38.75em) {
+				font-size: 3rem;
+			}
 		}
 
 		& > p {
 			font-size: 1.5rem;
 			margin: 0.5rem 0;
 			font-weight: 600;
+			@media (max-width: 38.75em) {
+				font-size: 1.2rem;
+			}
 		}
 
 		& > h3 {
 			font-size: 1.6rem;
 			margin: 0.5rem 0;
 			line-height: 1.5;
+			@media (max-width: 38.75em) {
+				font-size: 1.3rem;
+			}
 		}
 
 		& > h4 {
 			font-size: 1.3rem;
 			font-weight: bold;
 			margin: 0.5rem 0;
+			@media (max-width: 38.75em) {
+				font-size: 1rem;
+			}
 		}
 
 		& > h2 {
 			font-size: 2rem;
 			margin: 0.5rem 0;
+			@media (max-width: 38.75em) {
+				font-size: 1.6rem;
+			}
 		}
 
 		& > button {
@@ -253,7 +336,8 @@ const Details = styled.div`
 		}
 	}
 `
-const MovieInfo = styled.div`
+export const MovieInfo = styled.div`
+	margin: 3rem 0;
 	margin-left: 3rem;
 
 	& > h1 {
@@ -291,7 +375,7 @@ const MovieInfo = styled.div`
 	}
 `
 
-const Cast = styled.div`
+export const Cast = styled.div`
 	margin: 3rem auto;
 	display: flex;
 	flex-direction: column;
@@ -315,7 +399,7 @@ const Cast = styled.div`
 	}
 `
 
-const PhotoComponent = styled.div`
+export const PhotoComponent = styled.div`
 	display: flex;
 	overflow-x: scroll;
 	cursor: grab;
@@ -355,4 +439,47 @@ const PhotoComponent = styled.div`
 	}
 `
 
-const SimilarComponent = styled.div``
+export const TrailerComponent = styled.div`
+	display: flex;
+	margin: 3rem auto;
+	max-width: 50rem;
+	flex-direction: column;
+	align-items: center;
+	padding: 0 1.5rem;
+
+	& > h1 {
+		text-transform: uppercase;
+		color: white;
+		position: relative;
+
+		&:after {
+			position: absolute;
+			content: "";
+			bottom: -0.5rem;
+			left: 25%;
+			border: 2px solid var(--underline);
+			width: 50%;
+		}
+	}
+
+	& > div {
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+		padding-top: 56.25%;
+	}
+	& > div iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	& > p {
+		color: white;
+		font-size: 1.5rem;
+	}
+`
