@@ -12,7 +12,10 @@ export default function Header() {
 
 	return (
 		<HeaderContainer>
-			<LogoContainer>logo</LogoContainer>
+			<LogoContainer>
+				<Image src="/vercel.svg" width={15} height={15} alt="logo" />
+				movie spot
+			</LogoContainer>
 			<LinkContainer>
 				{router.pathname === "/" ? (
 					<LinkList active>
@@ -34,11 +37,11 @@ export default function Header() {
 				)}
 				{router.pathname.split("/").filter((it) => it)[0] === "tv" ? (
 					<LinkList active>
-						<Link href="/tv">tv shows</Link>
+						<Link href="/tv">tvshows</Link>
 					</LinkList>
 				) : (
 					<LinkList>
-						<Link href="/tv">tv shows</Link>
+						<Link href="/tv">tvshows</Link>
 					</LinkList>
 				)}
 				{router.pathname === "/about" ? (
@@ -86,14 +89,25 @@ const HeaderContainer = styled.div`
 `
 
 const LogoContainer = styled.div`
-	font-size: 3.5rem;
-	color: #e50914;
+	font-size: 2rem;
+	color: red;
 	text-transform: uppercase;
 	margin-right: 0;
+	padding-left: 0rem;
 	padding-right: 0;
 
-	@media screen and (max-width: 34.375em) {
+	@media screen and (max-width: 34.875em) {
 		font-size: 1.5rem;
+	}
+
+	@media screen and (max-width: 21.375em) {
+		font-size: 1.3rem;
+	}
+
+	div {
+		@media screen and (max-width: 34.875em) {
+			width: 1.3rem;
+		}
 	}
 `
 
@@ -144,7 +158,7 @@ const LinkList = styled.li`
 	}
 
 	@media screen and (max-width: 22em) {
-		font-size: 0.9rem;
+		font-size: 0.8rem;
 	}
 `
 

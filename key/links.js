@@ -1,4 +1,4 @@
-import { key } from "./apikey"
+let key = process.env.NEXT_PUBLIC_API_KEY
 
 export const trending = `https://api.themoviedb.org/3/trending/all/week?api_key=${key}`
 

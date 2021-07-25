@@ -4,6 +4,7 @@ import { MovieContainer } from "../components/MovieSection"
 import MovieCard from "../components/MovieCard"
 import { useState } from "react"
 import { useRouter } from "next/router"
+import styled from "styled-components"
 
 const Search = ({ searchItem, data }) => {
 	const filterData = (file) => {
@@ -30,18 +31,20 @@ const Search = ({ searchItem, data }) => {
 
 	return (
 		<Layout>
-			<MovieContainer details>
-				<h1>{`search result for ${searchItem}`}</h1>
+			<SearchComponent>
+				<MovieContainer details>
+					<h1>{`search result for ${searchItem}`}</h1>
 
-				{tv.length > 0 ? (
-					<>
-						<MovieCard data={tv} all={true} />
-						{data.total_pages > page && <p onClick={getMore}>check out more </p>}
-					</>
-				) : (
-					<h1>{`Nothing found on ${searchItem}`}</h1>
-				)}
-			</MovieContainer>
+					{tv.length > 0 ? (
+						<>
+							<MovieCard data={tv} all={true} />
+							{data.total_pages > page && <p onClick={getMore}>check out more </p>}
+						</>
+					) : (
+						<h2>{`Nothing found on ${searchItem}`}</h2>
+					)}
+				</MovieContainer>
+			</SearchComponent>
 		</Layout>
 	)
 }
@@ -61,3 +64,7 @@ export async function getServerSideProps({ query }) {
 		},
 	}
 }
+
+const SearchComponent = styled.div`
+	min-height: 62.1vh;
+`

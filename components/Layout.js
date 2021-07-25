@@ -10,6 +10,7 @@ const Layout = ({ title, keywords, description, children }) => {
 				<title>{title}</title>
 				<meta name="description" content={description} />
 				<meta name="keywords" content={keywords} />
+				<link rel="icon" href="/vercel.svg" />
 			</Head>
 			<Header />
 			<ChildrenContainer>{children}</ChildrenContainer>

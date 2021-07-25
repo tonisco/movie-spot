@@ -3,7 +3,7 @@ import Layout from "../components/Layout"
 
 const About = () => {
 	return (
-		<Layout title="About">
+		<Layout title="Movie Spot | About">
 			<AboutComponent>
 				<h1>About</h1>
 				<p>
