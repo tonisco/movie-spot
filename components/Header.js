@@ -2,12 +2,15 @@ import styled from "styled-components"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import Image from "next/image"
+import { useState } from "react"
 
 export default function Header() {
 	const router = useRouter()
+
+	const [searchV, setSearchV] = useState("")
 	const find = (e) => {
 		e.preventDefault()
-		router.push(`/search?q=${e.target.search.value}`)
+		if (searchV.length > 0) router.push(`/search?q=${searchV}`)
 	}
 
 	return (
@@ -65,7 +68,13 @@ export default function Header() {
 			</LinkContainer>
 			<SearchComponent>
 				<form onSubmit={find}>
-					<input type="text" name="search" placeholder="Search" />
+					<input
+						type="text"
+						name="search"
+						value={searchV}
+						placeholder="Search"
+						onChange={(e) => setSearchV(e.target.value)}
+					/>
 					<button type="submit">
 						<Image src="/images/search.svg" height={13} width={13} alt="search icon" />
 					</button>
@@ -84,6 +93,7 @@ const HeaderContainer = styled.div`
 	flex-wrap: wrap;
 	padding: 0.5rem 2.5rem 0;
 	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
 
 	@media screen and (max-width: 34.375em) {
 		padding: 0.5rem 0.5rem 0;

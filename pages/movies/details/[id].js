@@ -11,6 +11,13 @@ import { removeMovie, saveMovie } from "../../../key/Save"
 const MovieDetails = ({ movieData, similarMovieData }) => {
 	const scrollRef = useRef("")
 
+	const truncate = (text) => {
+		if (text.length > 200) {
+			return text.substr(0, 200) + "..."
+		}
+		return text
+	}
+
 	const [moviesSaved, setMoviesSaved] = useState([])
 
 	useEffect(() => {
@@ -68,8 +75,6 @@ const MovieDetails = ({ movieData, similarMovieData }) => {
 		scrollRef.current.scrollLeft = scrollLeft - scroll
 	}
 
-	console.log(scrollRef.current)
-
 	let formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
 
 	const save = () => {
@@ -116,19 +121,35 @@ const MovieDetails = ({ movieData, similarMovieData }) => {
 						width="250"
 						alt="main image"
 					/>
-					<div className="details">
-						<h1>{movieData.title ? movieData.title : movieData.original_title}</h1>
-						<p>{movieData.release_date.split("-")[0]}</p>
-						<h4>{`${genre(movieData.genres)}`}</h4>
-						<h2>{`${movieData.vote_average.toFixed(1)}`}</h2>
-						<p>{time(movieData.runtime)}</p>
-						<h3>{movieData.overview}</h3>
-						{moviesSaved.find((item) => item.id === movieData.id) ? (
-							<button onClick={remove}>added to list</button>
-						) : (
-							<button onClick={save}>add to list</button>
-						)}
-					</div>
+					{movieData.overview.length > 300 ? (
+						<InfoDetails short>
+							<h1>{movieData.title ? movieData.title : movieData.original_title}</h1>
+							<p>{movieData.release_date.split("-")[0]}</p>
+							<h4>{`${genre(movieData.genres)}`}</h4>
+							<h2>{`${movieData.vote_average.toFixed(1)}`}</h2>
+							<p>{time(movieData.runtime)}</p>
+							{<h3>{movieData.overview}</h3>}
+							{moviesSaved.find((item) => item.id === movieData.id) ? (
+								<button onClick={remove}>added to list</button>
+							) : (
+								<button onClick={save}>add to list</button>
+							)}
+						</InfoDetails>
+					) : (
+						<InfoDetails>
+							<h1>{movieData.title ? movieData.title : movieData.original_title}</h1>
+							<p>{movieData.release_date.split("-")[0]}</p>
+							<h4>{`${genre(movieData.genres)}`}</h4>
+							<h2>{`${movieData.vote_average.toFixed(1)}`}</h2>
+							<p>{time(movieData.runtime)}</p>
+							{<h3>{movieData.overview}</h3>}
+							{moviesSaved.find((item) => item.id === movieData.id) ? (
+								<button onClick={remove}>added to list</button>
+							) : (
+								<button onClick={save}>add to list</button>
+							)}
+						</InfoDetails>
+					)}
 				</Details>
 			</ImageComponent>
 			<MovieInfo>
@@ -234,6 +255,8 @@ export const ImageComponent = styled.div`
 	position: relative;
 	object-fit: contain;
 	overflow: hidden;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
 `
 
 export const Blur = styled.div`
@@ -253,10 +276,13 @@ export const Details = styled.div`
 	width: 100%;
 	height: 100%;
 	margin: 0 1rem;
+	transform: translateY(5%);
+
 	@media (max-width: 38.75em) {
 		flex-direction: column;
 		align-items: flex-start;
 		margin: 0 10%;
+		transform: translateY(0);
 	}
 
 	& > div {
@@ -270,67 +296,87 @@ export const Details = styled.div`
 		border-radius: 10px;
 		overflow: hidden;
 	}
+`
 
-	& > .details {
-		max-width: 53rem;
-		margin-left: 3rem;
-		margin-right: 1.5rem;
-		z-index: 2;
-		color: #232323;
+export const InfoDetails = styled.div`
+	max-width: 53rem;
+	margin-left: 3rem;
+	margin-right: 1.5rem;
+	z-index: 2;
+	color: #232323;
+	text-transform: capitalize;
+	@media (max-width: 45.625em) {
+		margin-left: 1.5rem;
+	}
+
+	@media (max-width: 28.175em) {
+		width: 85% !important;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
+	& > h1 {
+		font-size: 3.5rem;
+		margin: 0.5rem 0;
+		@media (max-width: 38.75em) {
+			${(props) => props.short && `font-size:2.5rem`}
+		}
+	}
+
+	& > p {
+		font-size: 1.5rem;
+		margin: 0.5rem 0;
+		font-weight: 600;
+		@media (max-width: 38.75em) {
+			${(props) => props.short && `font-size:1rem`}
+		}
+	}
+
+	& > h3 {
+		font-size: 1.6rem;
+		margin: 0.5rem 0;
+		line-height: 1.5;
+		@media (max-width: 38.75em) {
+			${(props) => props.short && `font-size:1.1rem`}
+		}
+	}
+
+	& > h4 {
+		font-size: 1.3rem;
+		font-weight: bold;
+		margin: 0.5rem 0;
+		@media (max-width: 38.75em) {
+			${(props) => props.short && `font-size:0.9rem`}
+		}
+	}
+
+	& > h2 {
+		font-size: 2rem;
+		margin: 0.5rem 0;
+		@media (max-width: 38.75em) {
+			${(props) => props.short && `font-size:1.5rem`}
+		}
+	}
+
+	& > button {
+		font-size: 1.5rem;
 		text-transform: capitalize;
-		@media (max-width: 45.625em) {
-			margin-left: 1.5rem;
-		}
-
-		@media (max-width: 28.175em) {
-			width: 80%;
-			margin-left: 0;
-		}
-
-		& > h1 {
-			font-size: 3.5rem;
-			margin: 0.5rem 0;
-		}
-
-		& > p {
-			font-size: 1.5rem;
-			margin: 0.5rem 0;
-			font-weight: 600;
-		}
-
-		& > h3 {
-			font-size: 1.6rem;
-			margin: 0.5rem 0;
-			line-height: 1.5;
-		}
-
-		& > h4 {
-			font-size: 1.3rem;
-			font-weight: bold;
-			margin: 0.5rem 0;
-		}
-
-		& > h2 {
-			font-size: 2rem;
-			margin: 0.5rem 0;
-		}
-
-		& > button {
-			font-size: 1.5rem;
-			text-transform: capitalize;
-			color: white;
-			font-weight: 600;
-			margin: 0.5rem auto;
-			padding: 0.8rem 1.1rem;
-			background-color: #e50914;
-			border-radius: 10px;
-			border: none;
-			box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-			transition: all 0.3s linear;
-			cursor: pointer;
+		color: white;
+		font-weight: 600;
+		margin: 0.5rem auto;
+		padding: 0.8rem 1.1rem;
+		background-color: #e50914;
+		border-radius: 10px;
+		border: none;
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+		transition: all 0.3s linear;
+		cursor: pointer;
+		@media (max-width: 38.75em) {
+			${(props) => props.short && `font-size:1.3rem`}
 		}
 	}
 `
+
 export const MovieInfo = styled.div`
 	margin: 3rem 0;
 	margin-left: 3rem;

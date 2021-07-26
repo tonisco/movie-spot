@@ -52,8 +52,6 @@ const Search = ({ searchItem, data }) => {
 export default Search
 
 export async function getServerSideProps({ query }) {
-	console.log(query.q)
-
 	const searchData = await fetch(`${searchLink}${query.q}`)
 	const data = await searchData.json()
 

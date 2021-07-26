@@ -8,6 +8,7 @@ import {
 	Cast,
 	PhotoComponent,
 	TrailerComponent,
+	InfoDetails,
 } from "../../movies/details/[id]"
 import { MovieContainer } from "../../../components/MovieSection"
 import MovieCard, { CardComponent, CardContainer } from "../../../components/MovieCard"
@@ -28,8 +29,6 @@ const TvDetails = ({ tvData, similarTvData }) => {
 
 		setTvSaved(savedTvs())
 	}, [])
-
-	console.log(tvData)
 
 	const genre = (data) => {
 		let list = []
@@ -72,7 +71,6 @@ const TvDetails = ({ tvData, similarTvData }) => {
 	}
 
 	const save = () => {
-		console.log(tvSaved)
 		let { poster_path, name, id, first_air_date, vote_average } = tvData
 		vote_average = vote_average.toFixed(1)
 		first_air_date = first_air_date.split("-")[0]
@@ -83,7 +81,6 @@ const TvDetails = ({ tvData, similarTvData }) => {
 	}
 
 	const remove = () => {
-		console.log(tvSaved)
 		removeTv(tvSaved, tvData.id)
 		setTvSaved((prev) => prev.filter((item) => item.id !== tvData.id))
 	}
@@ -117,19 +114,35 @@ const TvDetails = ({ tvData, similarTvData }) => {
 						width="250"
 						alt="main image"
 					/>
-					<div className="details">
-						<h1>{tvData.name ? tvData.name : tvData.original_name}</h1>
-						<p>{tvData.first_air_date.split("-")[0]}</p>
-						<h4>{`${genre(tvData.genres)}`}</h4>
-						<h2>{`${tvData.vote_average.toFixed(1)}`}</h2>
-						<p>{`${tvData.number_of_seasons} seasons`}</p>
-						<h3>{tvData.overview}</h3>
-						{tvSaved.find((item) => +item.id === tvData.id) ? (
-							<button onClick={remove}>added to list</button>
-						) : (
-							<button onClick={save}>add to list</button>
-						)}
-					</div>
+					{tvData.overview.length > 300 ? (
+						<InfoDetails short>
+							<h1>{tvData.name ? tvData.name : tvData.original_name}</h1>
+							<p>{tvData.first_air_date.split("-")[0]}</p>
+							<h4>{`${genre(tvData.genres)}`}</h4>
+							<h2>{`${tvData.vote_average.toFixed(1)}`}</h2>
+							<p>{`${tvData.number_of_seasons} seasons`}</p>
+							<h3>{tvData.overview}</h3>
+							{tvSaved.find((item) => +item.id === tvData.id) ? (
+								<button onClick={remove}>added to list</button>
+							) : (
+								<button onClick={save}>add to list</button>
+							)}
+						</InfoDetails>
+					) : (
+						<InfoDetails>
+							<h1>{tvData.name ? tvData.name : tvData.original_name}</h1>
+							<p>{tvData.first_air_date.split("-")[0]}</p>
+							<h4>{`${genre(tvData.genres)}`}</h4>
+							<h2>{`${tvData.vote_average.toFixed(1)}`}</h2>
+							<p>{`${tvData.number_of_seasons} seasons`}</p>
+							<h3>{tvData.overview}</h3>
+							{tvSaved.find((item) => +item.id === tvData.id) ? (
+								<button onClick={remove}>added to list</button>
+							) : (
+								<button onClick={save}>add to list</button>
+							)}
+						</InfoDetails>
+					)}
 				</Details>
 			</ImageComponent>
 			<Seasons>

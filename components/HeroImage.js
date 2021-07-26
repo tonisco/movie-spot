@@ -13,15 +13,12 @@ const HeroImage = ({ trends, type }) => {
 		return text
 	}
 
-	const [hero, setHeroImage] = useState([])
 	const [moviesSaved, setMoviesSaved] = useState([])
 	const [tvSaved, setTvSaved] = useState([])
 
 	const router = useRouter()
 
 	const allHero = [1, 2, 3, 4, 5, 6, 7, 8]
-
-	console.log(moviesSaved)
 
 	useEffect(() => {
 		const shift = () => {
@@ -61,7 +58,6 @@ const HeroImage = ({ trends, type }) => {
 	}, [])
 
 	const save = (index) => {
-		console.log(trends[index])
 		let {
 			poster_path,
 			name,
@@ -90,7 +86,6 @@ const HeroImage = ({ trends, type }) => {
 	}
 
 	const remove = (index) => {
-		console.log(trends[index])
 		let { id, media_type } = trends[index]
 		if ((media_type || type) === "movie") {
 			removeMovie(moviesSaved, id)
