@@ -46,6 +46,10 @@ export const MovieContainer = styled.div`
 			border: 2px solid var(--underline);
 			width: 50%;
 		}
+
+		@media screen and (max-width: 34.375em) {
+			font-size: 1.6rem;
+		}
 	}
 
 	& > p {

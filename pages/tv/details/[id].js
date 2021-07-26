@@ -133,7 +133,7 @@ const TvDetails = ({ tvData, similarTvData }) => {
 				</Details>
 			</ImageComponent>
 			<Seasons>
-				<CardComponent>
+				<CardComponent season>
 					{tvData.seasons.map((tv) => {
 						return (
 							<CardContainer className="" key={tv.id}>

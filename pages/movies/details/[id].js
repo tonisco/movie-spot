@@ -253,12 +253,17 @@ export const Details = styled.div`
 	width: 100%;
 	height: 100%;
 	margin: 0 1rem;
-	@media (max-width: 28.175em) {
+	@media (max-width: 38.75em) {
 		flex-direction: column;
+		align-items: flex-start;
+		margin: 0 10%;
 	}
 
 	& > div {
 		min-width: 22rem;
+		@media (max-width: 28.175em) {
+			width: 50%;
+		}
 	}
 
 	& > div > img {
@@ -277,47 +282,37 @@ export const Details = styled.div`
 			margin-left: 1.5rem;
 		}
 
+		@media (max-width: 28.175em) {
+			width: 80%;
+			margin-left: 0;
+		}
+
 		& > h1 {
 			font-size: 3.5rem;
 			margin: 0.5rem 0;
-			@media (max-width: 38.75em) {
-				font-size: 3rem;
-			}
 		}
 
 		& > p {
 			font-size: 1.5rem;
 			margin: 0.5rem 0;
 			font-weight: 600;
-			@media (max-width: 38.75em) {
-				font-size: 1.2rem;
-			}
 		}
 
 		& > h3 {
 			font-size: 1.6rem;
 			margin: 0.5rem 0;
 			line-height: 1.5;
-			@media (max-width: 38.75em) {
-				font-size: 1.3rem;
-			}
 		}
 
 		& > h4 {
 			font-size: 1.3rem;
 			font-weight: bold;
 			margin: 0.5rem 0;
-			@media (max-width: 38.75em) {
-				font-size: 1rem;
-			}
 		}
 
 		& > h2 {
 			font-size: 2rem;
 			margin: 0.5rem 0;
-			@media (max-width: 38.75em) {
-				font-size: 1.6rem;
-			}
 		}
 
 		& > button {

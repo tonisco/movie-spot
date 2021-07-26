@@ -177,7 +177,7 @@ const ImageComponent = styled.div`
 const DetailsComponent = styled.div`
 	color: white;
 	max-width: 42rem;
-	transform: translate(8%, 17rem);
+	transform: translate(8%, 22rem);
 	& > p {
 		font-size: 1.5rem;
 	}

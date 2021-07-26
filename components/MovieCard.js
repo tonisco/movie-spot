@@ -67,11 +67,25 @@ export default MovieCard
 
 export const CardComponent = styled.div`
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	grid-template-columns: ${(props) =>
+		props.season
+			? "repeat(auto-fit, minmax(170px, max-content))"
+			: "repeat(auto-fit, minmax(170px, 1fr))"};
 	gap: 1.5rem;
 	width: 100%;
 	margin: 3rem auto;
 	transition: all 0.3s ease;
+
+	@media screen and (max-width: 50em) {
+		grid-template-columns: ${(props) =>
+			props.season
+				? "repeat(auto-fit, minmax(120px, max-content))"
+				: "repeat(auto-fit, minmax(120px, 1fr))"};
+	}
+
+	@media screen and (max-width: 16.375em) {
+		place-items: center;
+	}
 `
 
 export const CardContainer = styled.div`
@@ -96,6 +110,10 @@ export const CardContainer = styled.div`
 		text-transform: capitalize;
 		margin-top: 0.5rem;
 		font-weight: 600;
+
+		@media screen and (max-width: 50em) {
+			font-size: 1.3rem;
+		}
 	}
 
 	& > p {
